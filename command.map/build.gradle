@@ -1,0 +1,10 @@
+/*
+ * Copyright (c) ${year} Strelitzia. All rights reserved.
+ *
+ */
+
+plugins {
+    id 'java'
+}
+
+version = '1.0.0'

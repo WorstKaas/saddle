@@ -1,0 +1,11 @@
+main: worstkaas.saddle.command.map.Map
+name: MapCommand
+version: ${VERSION}
+api-version: "26.2"
+folia-supported: true
+author: AUTHOR
+description: DESCRIPTION
+permissions:
+  map.use:
+    description: Allows use of the /map command
+    default: true

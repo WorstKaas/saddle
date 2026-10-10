@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) ${year} Strelitzia. All rights reserved.
+ *
+ */
+
+plugins {
+    id 'java'
+}
+
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
+}
