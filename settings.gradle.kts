@@ -1,9 +1,9 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
 rootProject.name = "saddle"
 
 include("command.map")
 include("command.rules")
+include("portal")

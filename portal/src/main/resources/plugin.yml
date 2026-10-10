@@ -1,0 +1,44 @@
+main: strelitzia.saddle.portal.PortalPlugin
+name: PortalCommand
+version: ${VERSION}
+api-version: "26.2"
+folia-supported: true
+author: AUTHOR
+description: Warp between pre-defined portals with particle effects
+commands:
+  portal:
+    description: Manage portals
+    permission: portal.use
+    usage: /portal <name> [create|delete|edit|setAsSpawn|setExit|setEffect|setIcon]
+  portal help:
+    description: Shows help for portal commands
+    permission: portal.use
+    usage: /portal help
+permissions:
+  portal.use:
+    description: Allows use of portal commands
+    default: true
+  portal.create:
+    description: Allows creating new portals
+    default: op
+  portal.delete:
+    description: Allows deleting portals
+    default: op
+  portal.edit.location:
+    description: Allows editing portal location
+    default: op
+  portal.edit.name:
+    description: Allows editing portal name
+    default: op
+  portal.setasspawn:
+    description: Allows setting portal as spawn
+    default: op
+  portal.setexit:
+    description: Allows setting portal exit point
+    default: op
+  portal.seteffect:
+    description: Allows setting portal particle effect
+    default: op
+  portal.seticon:
+    description: Allows setting portal map icon
+    default: op
