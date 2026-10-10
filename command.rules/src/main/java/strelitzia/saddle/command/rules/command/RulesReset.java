@@ -25,9 +25,7 @@ public class RulesReset implements CommandExecutor {
 
     @Override
     public void run(CommandSender commandSender, CommandArguments commandArguments) {
-        playerDataRepository.getAll().thenAccept(players -> {
-            players.keySet().forEach(uuid -> playerDataRepository.put(uuid, false));
-        });
+        playerDataRepository.getAll().thenAccept(players -> players.keySet().forEach(uuid -> playerDataRepository.put(uuid, false)));
 
         for (var player : Bukkit.getOnlinePlayers()) {
             playerDataRepository.get(player.getUniqueId()).thenAccept(accepted -> {
