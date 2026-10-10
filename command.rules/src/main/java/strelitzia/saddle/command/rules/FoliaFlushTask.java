@@ -1,9 +1,8 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules;
+package strelitzia.saddle.command.rules;
 
 import com.crimsonwarpedcraft.cwcommons.store.DataStore;
 import com.crimsonwarpedcraft.cwcommons.store.bukkit.AutoFlushTask;

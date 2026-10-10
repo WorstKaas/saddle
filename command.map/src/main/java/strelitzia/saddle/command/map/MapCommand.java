@@ -2,14 +2,14 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.map;
+package strelitzia.saddle.command.map;
 
 import com.crimsonwarpedcraft.cwcommons.command.BaseCommand;
 import dev.jorel.commandapi.CommandAPICommand;
 
 /// Registers and handles the `/map` command
 ///
-/// @author worstkaas
+/// @author strelitzia
 public class MapCommand extends BaseCommand {
 
     public MapCommand(MapCommandPluginConfig config) {

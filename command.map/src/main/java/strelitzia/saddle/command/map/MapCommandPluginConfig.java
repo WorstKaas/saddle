@@ -2,7 +2,7 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.map;
+package strelitzia.saddle.command.map;
 
 import com.crimsonwarpedcraft.cwcommons.config.Config;
 import com.fasterxml.jackson.annotation.JsonProperty;

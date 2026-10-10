@@ -1,9 +1,8 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules.command;
+package strelitzia.saddle.command.rules.command;
 
 import dev.jorel.commandapi.executors.CommandArguments;
 import dev.jorel.commandapi.executors.CommandExecutor;
@@ -12,9 +11,9 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import worstkaas.saddle.command.rules.RulesPlugin;
-import worstkaas.saddle.command.rules.config.RulesConfigProvider;
-import worstkaas.saddle.command.rules.gui.RulesGuiFactory;
+import strelitzia.saddle.command.rules.RulesPlugin;
+import strelitzia.saddle.command.rules.config.RulesConfigProvider;
+import strelitzia.saddle.command.rules.gui.RulesGuiFactory;
 
 /// Command to display the rules for re-reading
 @AllArgsConstructor

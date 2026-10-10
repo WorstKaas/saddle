@@ -1,9 +1,8 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules.config;
+package strelitzia.saddle.command.rules.config;
 
 import com.crimsonwarpedcraft.cwcommons.config.bukkit.BukkitConfigManagerBuilder;
 import lombok.AccessLevel;

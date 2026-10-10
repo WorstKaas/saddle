@@ -2,7 +2,7 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules;
+package strelitzia.saddle.command.rules;
 
 import com.crimsonwarpedcraft.cwcommons.store.DataStore;
 import com.crimsonwarpedcraft.cwcommons.store.KeySerializers;
@@ -12,9 +12,9 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIPaperConfig;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.plugin.java.JavaPlugin;
-import worstkaas.saddle.command.rules.command.RulesCommand;
-import worstkaas.saddle.command.rules.config.RulesConfigProvider;
-import worstkaas.saddle.command.rules.listener.PlayerListener;
+import strelitzia.saddle.command.rules.command.RulesCommand;
+import strelitzia.saddle.command.rules.config.RulesConfigProvider;
+import strelitzia.saddle.command.rules.listener.PlayerListener;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-main: worstkaas.saddle.command.rules.RulesPlugin
+main: strelitzia.saddle.command.rules.RulesPlugin
 name: RulesCommand
 version: ${VERSION}
 api-version: "26.2"

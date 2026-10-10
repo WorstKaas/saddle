@@ -2,7 +2,7 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules.gui;
+package strelitzia.saddle.command.rules.gui;
 
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.data.dialog.ActionButton;
@@ -14,7 +14,7 @@ import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
-import worstkaas.saddle.command.rules.config.RulesConfigProvider;
+import strelitzia.saddle.command.rules.config.RulesConfigProvider;
 
 import java.util.Locale;
 

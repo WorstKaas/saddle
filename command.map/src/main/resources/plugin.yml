@@ -1,4 +1,4 @@
-main: worstkaas.saddle.command.map.Map
+main: strelitzia.saddle.command.map.Map
 name: MapCommand
 version: ${VERSION}
 api-version: "26.2"

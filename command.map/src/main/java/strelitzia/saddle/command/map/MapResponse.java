@@ -2,7 +2,7 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.map;
+package strelitzia.saddle.command.map;
 
 import dev.jorel.commandapi.executors.CommandArguments;
 import dev.jorel.commandapi.executors.CommandExecutor;

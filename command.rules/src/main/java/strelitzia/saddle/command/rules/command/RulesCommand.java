@@ -2,12 +2,12 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules.command;
+package strelitzia.saddle.command.rules.command;
 
 import com.crimsonwarpedcraft.cwcommons.command.BaseCommand;
 import com.crimsonwarpedcraft.cwcommons.store.Repository;
 import dev.jorel.commandapi.CommandAPICommand;
-import worstkaas.saddle.command.rules.RulesPlugin;
+import strelitzia.saddle.command.rules.RulesPlugin;
 
 import java.util.UUID;
 

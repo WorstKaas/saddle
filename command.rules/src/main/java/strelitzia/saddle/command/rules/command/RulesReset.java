@@ -1,9 +1,8 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules.command;
+package strelitzia.saddle.command.rules.command;
 
 import com.crimsonwarpedcraft.cwcommons.store.Repository;
 import dev.jorel.commandapi.executors.CommandArguments;
@@ -11,8 +10,8 @@ import dev.jorel.commandapi.executors.CommandExecutor;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import worstkaas.saddle.command.rules.RulesPlugin;
-import worstkaas.saddle.command.rules.gui.RulesGuiFactory;
+import strelitzia.saddle.command.rules.RulesPlugin;
+import strelitzia.saddle.command.rules.gui.RulesGuiFactory;
 
 import java.util.UUID;
 

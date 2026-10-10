@@ -2,7 +2,7 @@
  * Copyright 2026 Strelitzia. All rights reserved.
  */
 
-package worstkaas.saddle.command.rules.listener;
+package strelitzia.saddle.command.rules.listener;
 
 import com.crimsonwarpedcraft.cwcommons.store.bukkit.PlayerDataManager;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import worstkaas.saddle.command.rules.RulesPlugin;
-import worstkaas.saddle.command.rules.gui.RulesGuiFactory;
+import strelitzia.saddle.command.rules.RulesPlugin;
+import strelitzia.saddle.command.rules.gui.RulesGuiFactory;
 
 /**
  * Listens for new players joining and force them to read the rules
