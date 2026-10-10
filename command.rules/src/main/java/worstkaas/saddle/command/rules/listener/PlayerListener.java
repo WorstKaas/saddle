@@ -1,4 +1,6 @@
-// Copyright (c) 2026 WorstKaas. All rights reserved.
+/*
+ * Copyright 2026 Strelitzia. All rights reserved.
+ */
 
 package worstkaas.saddle.command.rules.listener;
 

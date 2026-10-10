@@ -1,6 +1,5 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
 package worstkaas.saddle.command.map;
