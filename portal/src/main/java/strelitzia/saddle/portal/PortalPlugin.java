@@ -12,6 +12,7 @@ import dev.jorel.commandapi.CommandAPIPaperConfig;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import strelitzia.saddle.portal.command.PortalCommand;
 import strelitzia.saddle.portal.config.PortalConfigProvider;
@@ -21,6 +22,7 @@ import strelitzia.saddle.portal.integration.BlueMapIntegration;
 import strelitzia.saddle.portal.listener.PlayerListener;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /// Main plugin class for the Portal command module
 /// Handles initialization of data stores, particle effects, BlueMap integration, and event listeners
@@ -79,6 +81,10 @@ public final class PortalPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(portalManager, this), this);
 
         new PortalCommand(portalManager).register();
+
+        Arrays.stream(PlayerRespawnEvent.getHandlerList().getRegisteredListeners()).forEach(rl ->
+                getLogger().info("Respawn listener: %s (%s) priority=%s"
+                        .formatted(rl.getListener().getClass().getName(), rl.getPlugin().getName(), rl.getPriority())));
 
         getLogger().info("PortalPlugin has been enabled");
     }

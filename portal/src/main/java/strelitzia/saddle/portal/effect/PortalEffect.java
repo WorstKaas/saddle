@@ -54,7 +54,7 @@ public abstract class PortalEffect {
         };
     }
 
-    /// displays a particle based portal effect
+    /// displays a particle-based portal effect
     @SuppressFBWarnings(
             value = "PREDICTABLE_RANDOM",
             justification = "False positive: ThreadLocalRandom is used for non-security-sensitive purposes."

@@ -6,7 +6,8 @@ package strelitzia.saddle.command.rules.listener;
 
 import com.crimsonwarpedcraft.cwcommons.store.bukkit.PlayerDataManager;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +26,7 @@ public class PlayerListener implements Listener {
 
     private final RulesPlugin plugin;
     private final PlayerDataManager<Boolean> manager;
+    private static final MiniMessage MINI = MiniMessage.miniMessage();
 
     /**
      * Listens for players joining and prompts them to read the rules
@@ -40,12 +42,16 @@ public class PlayerListener implements Listener {
             }
             var dialog = RulesGuiFactory.getDialog(true, () -> onAccept(player));
             player.getScheduler().runDelayed(plugin, _ -> player.showDialog(dialog), null, 20L);
-        }).exceptionally(_ -> null);
+        }).exceptionally(e -> {
+            plugin.getLogger().severe("Failed to print welcome message");
+            e.printStackTrace();
+            return null;
+        });
     }
 
     private void onAccept(Player player) {
         manager.save(player, true);
-        var message = RulesConfigProvider.getConfig().getWelcomeMessage().replace("{player}", player.getName());
-        Bukkit.broadcast(Component.text(message));
+        var message = RulesConfigProvider.getConfig().getWelcomeMessage();
+        Bukkit.broadcast(MINI.deserialize(message, Placeholder.unparsed("player", player.getName())));
     }
 }

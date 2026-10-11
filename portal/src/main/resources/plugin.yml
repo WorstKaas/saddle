@@ -1,6 +1,6 @@
 main: strelitzia.saddle.portal.PortalPlugin
 name: saddle.portal
-version: ${VERSION}
+version: ${version}
 api-version: "26.2"
 folia-supported: true
 author: AUTHOR
@@ -17,7 +17,7 @@ commands:
 permissions:
   portal.use:
     description: Allows use of portal commands
-    default: true
+    default: op
   portal.create:
     description: Allows creating new portals
     default: op

@@ -96,7 +96,6 @@ subprojects {
             isTransitive = false
         }
         implementation("org.hibernate.validator:hibernate-validator:9.1.4.Final")
-        compileOnly("de.bluecolored:bluemap-api:2.7.7")
 
         testImplementation("org.mockito:mockito-core:5.24.0")
         mockitoAgent("org.mockito:mockito-core:5.24.0") { isTransitive = false }

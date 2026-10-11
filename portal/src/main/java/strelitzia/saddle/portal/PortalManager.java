@@ -29,8 +29,8 @@ public class PortalManager {
     private final Map<String, Portal> portalCache = new ConcurrentHashMap<>();
 
     /// @return The current main spawn portal, or empty if none exists
-    public CompletableFuture<Optional<Portal>> getSpawnPortal() {
-        return getPortals().thenApplyAsync(portals -> portals.stream().filter(Portal::isSpawn).findFirst());
+    public Optional<Portal> getSpawnPortal() {
+        return portalCache.values().stream().filter(Portal::isSpawn).findFirst();
     }
 
     /// Sets the icon for a portal

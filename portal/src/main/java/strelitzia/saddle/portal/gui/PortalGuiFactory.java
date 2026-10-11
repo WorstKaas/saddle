@@ -69,10 +69,8 @@ public class PortalGuiFactory {
         // Edit Favourites button transitions to the favorites editor
         buttons.add(ActionButton.create(Component.text("Edit Favourites"), null, 200,
                 DialogAction.customClick((_, _) -> {
-                    var portalDialog = getDialog(source, onPortalSelect, player);
                     var favouritesDialog = getFavouritesDialog(source, onPortalSelect, updatedFavourites -> {
-                        portalManager.setFavourites(player, updatedFavourites).join();
-                        player.showDialog(portalDialog);
+                        portalManager.setFavourites(player, updatedFavourites).thenRunAsync(() -> player.showDialog(getDialog(source, onPortalSelect, player)));
                     }, player);
 
                     player.showDialog(favouritesDialog);
@@ -95,9 +93,9 @@ public class PortalGuiFactory {
 
     /// Creates a button for selecting a portal
     private static ActionButton createPortalButton(Portal portal, Consumer<Portal> onPortalSelect, boolean favourite) {
-        var buttonText = Component.text(portal.getName(), favourite ? NamedTextColor.YELLOW : NamedTextColor.WHITE);
+        var buttonText = Component.text(portal.getName(), favourite ? NamedTextColor.GOLD : NamedTextColor.WHITE);
         var buttonAction = DialogAction.customClick((_, _) -> onPortalSelect.accept(portal), SINGLE_USE);
-        return ActionButton.create(buttonText, null, 400, buttonAction);
+        return ActionButton.create(buttonText, null, 200, buttonAction);
     }
 
 
@@ -113,9 +111,9 @@ public class PortalGuiFactory {
         var favourites = portalManager.getFavourites(player.getUniqueId()).join();
 
         var inputs = new ArrayList<DialogInput>();
-        for (Portal portal : portals) {
+        for (var portal : portals) {
             boolean isFavourite = favourites.contains(portal.getId());
-            inputs.add(DialogInput.bool("portal_" + portal.getId(), Component.text(portal.getName()))
+            inputs.add(DialogInput.bool(inputKey(portal), Component.text(portal.getName()))
                     .initial(isFavourite)
                     .build());
         }
@@ -125,7 +123,7 @@ public class PortalGuiFactory {
                 DialogAction.customClick((response, _) -> {
                     var updatedFavourites = new HashMap<UUID, Boolean>();
                     for (var portal : portals) {
-                        updatedFavourites.put(portal.getId(), response.getBoolean("portal_" + portal.getId()));
+                        updatedFavourites.put(portal.getId(), response.getBoolean(inputKey(portal)));
                     }
                     onSave.accept(updatedFavourites);
                 }, SINGLE_USE));
@@ -146,5 +144,11 @@ public class PortalGuiFactory {
                         .inputs(inputs)
                         .build())
                 .type(DialogType.confirmation(saveButton, cancelButton)));
+    }
+
+    /// Dialog input keys may only contain letters, digits, and underscores, so strip the UUID hyphens. Cannot use names
+    /// as those can change
+    private static String inputKey(Portal portal) {
+        return "portal_" + portal.getId().toString().replace("-", "");
     }
 }

@@ -13,7 +13,10 @@ import org.bukkit.command.CommandSender;
 import strelitzia.saddle.command.rules.RulesPlugin;
 import strelitzia.saddle.command.rules.gui.RulesGuiFactory;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 /// resets the has-read rules flag for a player, forcing them to re-read the rules on login, and showing them to all
 /// currently online players forcing them to re-accept them
@@ -25,17 +28,22 @@ public class RulesReset implements CommandExecutor {
 
     @Override
     public void run(CommandSender commandSender, CommandArguments commandArguments) {
-        playerDataRepository.getAll().thenAccept(players -> players.keySet().forEach(uuid -> playerDataRepository.put(uuid, false)));
-
-        for (var player : Bukkit.getOnlinePlayers()) {
-            playerDataRepository.get(player.getUniqueId()).thenAccept(accepted -> {
-                if (accepted.orElse(false)) {
-                    return;
-                }
-                var dialog =
-                        RulesGuiFactory.getDialog(true, () -> playerDataRepository.put(player.getUniqueId(), true));
-                player.getScheduler().run(plugin, _ -> player.showDialog(dialog), null);
-            }).exceptionally(_ -> null);
-        }
+        var online = List.copyOf(Bukkit.getOnlinePlayers());
+        playerDataRepository.getAll()
+                .thenCompose(players -> CompletableFuture.allOf(
+                        players.keySet().stream()
+                                .map(uuid -> playerDataRepository.put(uuid, false))
+                                .toArray(CompletableFuture[]::new)))
+                .thenRun(() -> {
+                    for (var player : online) {
+                        var dialog = RulesGuiFactory.getDialog(true,
+                                () -> playerDataRepository.put(player.getUniqueId(), true));
+                        player.getScheduler().run(plugin, _ -> player.showDialog(dialog), null);
+                    }
+                })
+                .exceptionally(ex -> {
+                    plugin.getLogger().log(Level.SEVERE, "Failed to reset rules acceptance", ex);
+                    return null;
+                });
     }
 }

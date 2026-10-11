@@ -13,4 +13,4 @@ body:
 
 # Global welcome message shown when a player accepts the rules for the first time
 # Use {player} for the player's name
-welcome-message: "&aWelcome {player}! Thank you for accepting the rules. Enjoy your stay!"
+welcome-message: "<green>Welcome <player>! Thank you for accepting the rules. Enjoy your stay!</green>"
