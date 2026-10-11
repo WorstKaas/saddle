@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import strelitzia.saddle.portal.command.PortalCommand;
 import strelitzia.saddle.portal.config.PortalConfigProvider;
-import strelitzia.saddle.portal.effect.ParticleEffectManager;
+import strelitzia.saddle.portal.effect.ParticleEffectScheduler;
 import strelitzia.saddle.portal.gui.PortalGuiFactory;
 import strelitzia.saddle.portal.integration.BlueMapIntegration;
 import strelitzia.saddle.portal.listener.PlayerListener;
@@ -74,7 +74,7 @@ public final class PortalPlugin extends JavaPlugin {
         var portalManager = new PortalManager(portalRepository, favouriteRepository, blueMapIntegration);
         PortalGuiFactory.init(portalManager);
 
-        var particleEffectManager = new ParticleEffectManager(this, portalRepository);
+        var particleEffectManager = new ParticleEffectScheduler(this, portalRepository);
         particleTask = particleEffectManager.start();
 
 

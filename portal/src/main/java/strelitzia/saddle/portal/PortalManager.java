@@ -76,6 +76,11 @@ public class PortalManager {
         });
     }
 
+    /// Refreshes all markers in blueMap
+    public void refreshMarkers() {
+        blueMap.refreshMarkers();
+    }
+
     /// Sets a portal as the spawn portal, ensuring only one spawn exists
     /// Removes spawn status from any existing spawn portal before setting the new one
     ///

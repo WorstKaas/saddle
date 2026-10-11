@@ -10,12 +10,7 @@ import strelitzia.saddle.portal.Portal;
 public class EndRodEffect extends PortalEffect {
 
     @Override
-    void display(Portal portal) {
-        super.displayParticles(portal, Particle.END_ROD);
-    }
-
-    @Override
-    public String getType() {
-        return "end_rod";
+    public void display(Portal portal) {
+        ParticleEmitter.emit(portal, Particle.END_ROD, .25);
     }
 }

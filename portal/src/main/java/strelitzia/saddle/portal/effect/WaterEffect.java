@@ -10,12 +10,7 @@ import strelitzia.saddle.portal.Portal;
 public class WaterEffect extends PortalEffect {
 
     @Override
-    void display(Portal portal) {
-        super.displayParticles(portal, Particle.FALLING_WATER);
-    }
-
-    @Override
-    public String getType() {
-        return "water";
+    public void display(Portal portal) {
+        ParticleEmitter.emit(portal, Particle.FALLING_WATER, 1);
     }
 }

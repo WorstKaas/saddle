@@ -5,6 +5,7 @@ api-version: "26.2"
 folia-supported: true
 author: AUTHOR
 description: Warp between pre-defined portals with particle effects
+softdepend: [BlueMap]
 commands:
   portal:
     description: Manage portals

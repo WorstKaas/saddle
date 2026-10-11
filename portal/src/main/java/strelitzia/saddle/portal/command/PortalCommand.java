@@ -48,27 +48,29 @@ public class PortalCommand extends BaseCommand {
         var delete = createCommand("delete", "portal.delete", deletePortal(pm))
                 .withArguments(portalNameArgument(pm));
 
+        var refresh = createCommand("refreshMarkers", "portal.refresh", (_, _) -> pm.refreshMarkers());
+
         // The following are /portal edit <name> <action> ...
         // Each one is registered as its own "edit" command, because CommandAPI does not reliably
         // pass an argument declared on a parent that only has subcommands down to its children.
-        var position = editCommand(pm, "location", "portal.edit.location", movePortal(pm),
+        var position = editCommand(pm, "moveTo", "portal.edit.location", movePortal(pm),
                 getPosArgs().toArray(new Argument<?>[0]));
         var rename = editCommand(pm, "rename", "portal.edit.name", renamePortal(pm),
                 new StringArgument("newName"));
         var spawn = editCommand(pm, "setAsSpawn", "portal.setasspawn", setPortalAsSpawn(pm));
-        var exit = editCommand(pm, "exit", "portal.setexit", setPortalExit(pm));
-        var effect = editCommand(pm, "effect", "portal.seteffect", setPortalEffect(pm),
+        var exit = editCommand(pm, "setExitPoint", "portal.setexit", setPortalExit(pm));
+        var effect = editCommand(pm, "setEffect", "portal.seteffect", setPortalEffect(pm),
                 new StringArgument("effectType").replaceSuggestions(
-                        ArgumentSuggestions.strings(PortalEffect.TYPES)));
+                        ArgumentSuggestions.strings(PortalEffect.TYPES.keySet().toArray(new String[0]))));
         // NamespacedKeyArgument is needed because a plain StringArgument can't contain ':' (minecraft:ender_pearl)
-        var icon = editCommand(pm, "icon", "portal.seticon", setPortalIcon(pm),
+        var icon = editCommand(pm, "setIcon", "portal.seticon", setPortalIcon(pm),
                 new NamespacedKeyArgument("icon"));
 
         var list = createCommand("list", "portal.list", listPortals(pm));
         var help = createCommand("help", "portal.use", portalHelp());
 
         return createCommand("portal", "portal.use", portalHelp())
-                .withSubcommands(create, list, help, delete, position, rename, spawn, exit, effect, icon);
+                .withSubcommands(create, list, refresh, help, delete, position, rename, spawn, exit, effect, icon);
     }
 
     private static CommandAPICommand createCommand(String name, String permissions, PlayerCommandExecutor executor) {

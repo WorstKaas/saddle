@@ -10,12 +10,7 @@ import strelitzia.saddle.portal.Portal;
 public class FlameEffect extends PortalEffect {
 
     @Override
-    void display(Portal portal) {
-        super.displayParticles(portal, Particle.FLAME);
-    }
-
-    @Override
-    public String getType() {
-        return "flame";
+    public void display(Portal portal) {
+        ParticleEmitter.emit(portal, Particle.FLAME, .25);
     }
 }

@@ -54,6 +54,10 @@ public class Portal implements Serializable {
         return PortalEffect.fromType(effectType);
     }
 
+    public void emitParticles() {
+        effect().display(this);
+    }
+
     /// Sets the effect by storing its type
     public void applyEffect(PortalEffect effect) {
         this.effectType = effect != null ? effect.getType() : null;

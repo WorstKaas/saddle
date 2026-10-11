@@ -15,7 +15,7 @@ import java.util.Map;
 /// Manages the display of particle effects for all portals
 /// Folia-compatible scheduler that runs on region schedulers for optimal performance
 @RequiredArgsConstructor
-public class ParticleEffectManager {
+public class ParticleEffectScheduler {
 
     /// The plugin instance for scheduling
     private final Plugin plugin;
@@ -26,7 +26,7 @@ public class ParticleEffectManager {
     /// @return the ScheduledTask that can be cancelled if needed
     public ScheduledTask start() {
         return plugin.getServer().getGlobalRegionScheduler()
-                .runAtFixedRate(plugin, _ -> displayEffects(), 1L, 5L);
+                .runAtFixedRate(plugin, _ -> displayEffects(), 1L, 3L);
     }
 
     /// Displays particle effects for all portals
@@ -35,8 +35,7 @@ public class ParticleEffectManager {
         portalRepository.getAll().thenAcceptAsync(portals -> {
             for (Map.Entry<String, Portal> entry : portals.entrySet()) {
                 var portal = entry.getValue();
-                plugin.getServer().getRegionScheduler().execute(plugin, portal.getExit(), () ->
-                    portal.effect().display(portal)
+                plugin.getServer().getRegionScheduler().execute(plugin, portal.getExit(), portal::emitParticles
                 );
             }
         }).exceptionally(_ -> null);

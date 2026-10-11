@@ -10,12 +10,7 @@ import strelitzia.saddle.portal.Portal;
 public class LeavesEffect extends PortalEffect {
 
     @Override
-    void display(Portal portal) {
-        super.displayParticles(portal, Particle.CHERRY_LEAVES);
-    }
-
-    @Override
-    public String getType() {
-        return "leaves";
+    public void display(Portal portal) {
+        ParticleEmitter.emit(portal, Particle.CHERRY_LEAVES, .25);
     }
 }

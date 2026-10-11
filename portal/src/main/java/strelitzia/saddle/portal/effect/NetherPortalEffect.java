@@ -10,12 +10,7 @@ import strelitzia.saddle.portal.Portal;
 public class NetherPortalEffect extends PortalEffect {
 
     @Override
-    void display(Portal portal) {
-        super.displayParticles(portal, Particle.PORTAL);
-    }
-
-    @Override
-    public String getType() {
-        return "portal";
+    public void display(Portal portal) {
+        ParticleEmitter.emit(portal, Particle.PORTAL, 1);
     }
 }
