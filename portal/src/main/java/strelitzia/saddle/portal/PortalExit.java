@@ -18,6 +18,6 @@ public record PortalExit(double x, double y, double z, float pitch, float yaw) i
     }
 
     public Location toLocation(UUID worldId) {
-        return new Location(Bukkit.getWorld(worldId), x, y, z, pitch, yaw);
+        return new Location(Bukkit.getWorld(worldId), x, y, z, yaw, pitch);
     }
 }
