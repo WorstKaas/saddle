@@ -33,6 +33,10 @@ public abstract class PortalEffect {
     /// @param portal portal at which to render the particles
     abstract void display(Portal portal);
 
+    /// Returns the type identifier for this effect
+    /// @return the effect type string
+    public abstract String getType();
+
     /// Creates a PortalEffect instance from a type string
     /// @param type the effect type name (case-insensitive)
     /// @return the corresponding PortalEffect implementation, or `null` if unknown

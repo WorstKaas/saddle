@@ -6,6 +6,8 @@ package strelitzia.saddle.portal;
 
 import org.bukkit.Location;
 
+import java.io.Serializable;
+
 /// simplified [Location] for portal corners
-public record PortalCorner(int x, int y, int z) {
+public record PortalCorner(int x, int y, int z) implements Serializable {
 }

@@ -28,8 +28,8 @@ public final class PortalPlugin extends JavaPlugin {
 
     /// Data store for persisting portal and player data
     private DataStore store;
-    /// Scheduled task for auto-flushing data store
-    private ScheduledTask autoFlushTask;
+    /// Flush task for auto-flushing data store
+    private FoliaFlushTask flushTask;
     /// Scheduled task for displaying particle effects
     private ScheduledTask particleTask;
 
@@ -59,7 +59,8 @@ public final class PortalPlugin extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
-        autoFlushTask = new FoliaFlushTask(store, this).start();
+        flushTask = new FoliaFlushTask(store, this);
+        flushTask.start();
 
         var portalRepository = store.repository("saddle.portal.portals", Portal.class, KeySerializers.forString());
         var favouriteRepository = store.repository("saddle.portal.favourites", FavouritePortals.class,
@@ -89,8 +90,8 @@ public final class PortalPlugin extends JavaPlugin {
         if (particleTask != null) {
             particleTask.cancel();
         }
-        if (autoFlushTask != null) {
-            autoFlushTask.cancel();
+        if (flushTask != null) {
+            flushTask.stop();
         }
         setInstance(null);
         if (store != null) {

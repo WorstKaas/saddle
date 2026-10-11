@@ -12,6 +12,10 @@ public class LavaEffect extends PortalEffect {
     @Override
     void display(Portal portal) {
         super.displayParticles(portal, Particle.LAVA);
+    }
 
+    @Override
+    public String getType() {
+        return "lava";
     }
 }

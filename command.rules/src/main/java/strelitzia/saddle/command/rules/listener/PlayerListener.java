@@ -6,11 +6,15 @@ package strelitzia.saddle.command.rules.listener;
 
 import com.crimsonwarpedcraft.cwcommons.store.bukkit.PlayerDataManager;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import strelitzia.saddle.command.rules.RulesPlugin;
+import strelitzia.saddle.command.rules.config.RulesConfigProvider;
 import strelitzia.saddle.command.rules.gui.RulesGuiFactory;
 
 /**
@@ -34,8 +38,14 @@ public class PlayerListener implements Listener {
             if (accepted.orElse(false)) {
                 return;
             }
-            var dialog = RulesGuiFactory.getDialog(true, () -> manager.save(player, true));
+            var dialog = RulesGuiFactory.getDialog(true, () -> onAccept(player));
             player.getScheduler().runDelayed(plugin, _ -> player.showDialog(dialog), null, 20L);
         }).exceptionally(_ -> null);
+    }
+
+    private void onAccept(Player player) {
+        manager.save(player, true);
+        var message = RulesConfigProvider.getConfig().getWelcomeMessage().replace("{player}", player.getName());
+        Bukkit.broadcast(Component.text(message));
     }
 }

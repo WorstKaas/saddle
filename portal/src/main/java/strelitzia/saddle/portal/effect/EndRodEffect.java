@@ -13,4 +13,9 @@ public class EndRodEffect extends PortalEffect {
     void display(Portal portal) {
         super.displayParticles(portal, Particle.END_ROD);
     }
+
+    @Override
+    public String getType() {
+        return "end_rod";
+    }
 }

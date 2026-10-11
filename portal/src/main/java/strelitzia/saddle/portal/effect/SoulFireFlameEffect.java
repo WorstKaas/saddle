@@ -12,6 +12,10 @@ public class SoulFireFlameEffect extends PortalEffect {
     @Override
     void display(Portal portal) {
         super.displayParticles(portal, Particle.SOUL_FIRE_FLAME);
+    }
 
+    @Override
+    public String getType() {
+        return "soul_fire_flame";
     }
 }

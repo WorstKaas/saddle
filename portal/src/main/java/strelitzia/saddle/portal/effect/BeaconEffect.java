@@ -14,4 +14,9 @@ public class BeaconEffect extends PortalEffect {
     void display(Portal portal) {
         super.displayParticles(portal, Particle.END_ROD);
     }
+
+    @Override
+    public String getType() {
+        return "beacon";
+    }
 }

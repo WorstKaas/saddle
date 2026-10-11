@@ -9,10 +9,12 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.NamespacedKeyArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import strelitzia.saddle.portal.Portal;
 import strelitzia.saddle.portal.PortalCorner;
 import strelitzia.saddle.portal.PortalManager;
@@ -41,40 +43,51 @@ public class PortalCommand extends BaseCommand {
                 .withArguments(new StringArgument("name"))
                 .withArguments(getPosArgs());
 
-        var delete = createCommand("delete", "portal.delete", deletePortal(pm));
-        var position =
-                createCommand("location", "portal.edit.location", movePortal(pm)).withArguments(getPosArgs());
-        var rename = createCommand("rename", "portal.edit.name", renamePortal(pm)).withArguments(
-                new StringArgument("newName"));
+        // /portal delete <name>
+        var delete = createCommand("delete", "portal.delete", deletePortal(pm))
+                .withArguments(portalNameArgument(pm));
+
+        // One shared /portal edit <name> node. Its actions are subcommands attached after <name>,
+        // so every action sees the name argument. Sibling nodes with the same literal name conflict.
+        var position = createCommand("location", "portal.edit.location", movePortal(pm))
+                .withArguments(getPosArgs());
+        var rename = createCommand("rename", "portal.edit.name", renamePortal(pm))
+                .withArguments(new StringArgument("newName"));
         var spawn = createCommand("setAsSpawn", "portal.setasspawn", setPortalAsSpawn(pm));
         var exit = createCommand("exit", "portal.setexit", setPortalExit(pm));
-        var effect = createCommand("effect", "portal.seteffect", setPortalEffect(pm)).withArguments(
-                new StringArgument("effectType").replaceSuggestions(ArgumentSuggestions.strings(
-                        PortalEffect.TYPES)));
-        var icon = createCommand("icon", "portal.seticon", setPortalIcon(pm));
+        var effect = createCommand("effect", "portal.seteffect", setPortalEffect(pm))
+                .withArguments(new StringArgument("effectType").replaceSuggestions(
+                        ArgumentSuggestions.strings(PortalEffect.TYPES)));
+        // NamespacedKeyArgument is needed because a plain StringArgument can't contain ':' (minecraft:ender_pearl)
+        var icon = createCommand("icon", "portal.seticon", setPortalIcon(pm))
+                .withArguments(new NamespacedKeyArgument("icon"));
 
         var edit = new CommandAPICommand("edit")
                 .withPermission("portal.edit")
-                .withArguments(
-                        new StringArgument("name")
-                                .replaceSuggestions(ArgumentSuggestions.stringsAsync(_ ->
-                                        pm.getPortals().thenApply(portals ->
-                                                portals.stream()
-                                                        .map(Portal::getName)
-                                                        .toArray(String[]::new)
-                                        )
-                                ))
-                )
+                .withArguments(portalNameArgument(pm))
                 .withSubcommands(position, rename, spawn, exit, effect, icon);
 
         var list = createCommand("list", "portal.list", listPortals(pm));
         var help = createCommand("help", "portal.use", portalHelp());
 
-        return createCommand("portal", "portal.use", portalHelp()).withSubcommands(create, list, edit, help, delete);
+        return createCommand("portal", "portal.use", portalHelp())
+                .withSubcommands(create, list, edit, help, delete);
     }
 
     private static CommandAPICommand createCommand(String name, String permissions, PlayerCommandExecutor executor) {
         return new CommandAPICommand(name).withPermission(permissions).executesPlayer(executor);
+    }
+
+    /// A `name` argument that suggests the names of all existing portals
+    private static Argument<String> portalNameArgument(PortalManager pm) {
+        return new StringArgument("name")
+                .replaceSuggestions(ArgumentSuggestions.stringsAsync(_ ->
+                        pm.getPortals().thenApply(portals ->
+                                portals.stream()
+                                        .map(Portal::getName)
+                                        .toArray(String[]::new)
+                        )
+                ));
     }
 
     private static List<Argument<?>> getPosArgs() {
@@ -89,8 +102,8 @@ public class PortalCommand extends BaseCommand {
             player.sendMessage("§e/portal create <name> <x1> <y1> <z1> <x2> <y2> <z2> §7- Creates a portal");
             player.sendMessage("§e/portal delete <name> §7- Deletes a portal");
             player.sendMessage(
-                    "§e/portal <name> edit location <x1> <y1> <z1> <x2> <y2> <z2> §7- Updates portal boundaries");
-            player.sendMessage("§e/portal edit <name> name <newName> §7- Renames a portal");
+                    "§e/portal edit <name> location <x1> <y1> <z1> <x2> <y2> <z2> §7- Updates portal boundaries");
+            player.sendMessage("§e/portal edit <name> rename <newName> §7- Renames a portal");
             player.sendMessage("§e/portal edit <name> setAsSpawn §7- Sets the spawn portal");
             player.sendMessage("§e/portal edit <name> exit §7- Sets the exit point");
             player.sendMessage("§e/portal edit <name> effect <effectType> §7- Sets the particle effect");
@@ -100,51 +113,45 @@ public class PortalCommand extends BaseCommand {
         };
     }
 
-    /// Handles the `/portal <name> setIcon <icon>` command
+    /// Handles the `/portal edit <name> icon <icon>` command
     private static PlayerCommandExecutor setPortalIcon(PortalManager portalManager) {
         return (player, args) -> {
-            var name = (String) Objects.requireNonNull(args.get("name"));
-            var icon = (String) Objects.requireNonNull(args.get("icon"));
-            portalManager.setIcon(name, icon, player);
+            var name = getName(args);
+            var icon = (NamespacedKey) Objects.requireNonNull(args.get("icon"));
+            portalManager.setIcon(name, icon.toString(), player);
         };
     }
 
-    /// Handles the `/portal <name> setEffect` command
+    /// Handles the `/portal edit <name> effect <effectType>` command
     private static PlayerCommandExecutor setPortalEffect(PortalManager portalManager) {
         return (player, args) -> {
-            var name = (String) Objects.requireNonNull(args.get("name"));
+            var name = getName(args);
             var effect = (String) Objects.requireNonNull(args.get("effectType"));
             portalManager.setEffect(name, effect, player);
         };
     }
 
-    /// Handles the `/portal <name> setExit` command
+    /// Handles the `/portal edit <name> exit` command
     private static PlayerCommandExecutor setPortalExit(PortalManager portalManager) {
-        return (player, args) -> {
-            var name = (String) Objects.requireNonNull(args.get("name"));
-            portalManager.setExit(name, player);
-        };
+        return (player, args) -> portalManager.setExit(getName(args), player);
     }
 
-    /// Handles the `/portal <name> setAsSpawn` command
+    /// Handles the `/portal edit <name> setAsSpawn` command
     private static PlayerCommandExecutor setPortalAsSpawn(PortalManager portalManager) {
-        return (player, args) -> {
-            var name = (String) Objects.requireNonNull(args.get("name"));
-            portalManager.setSpawnPortal(name, player);
-        };
+        return (player, args) -> portalManager.setSpawnPortal(getName(args), player);
     }
 
-    /// Handles the `/portal <name> rename` command
+    /// Handles the `/portal edit <name> rename <newName>` command
     private static PlayerCommandExecutor renamePortal(PortalManager portalManager) {
         return (player, args) -> {
-            var name = (String) Objects.requireNonNull(args.get("name"));
+            var name = getName(args);
             var newName = (String) Objects.requireNonNull(args.get("newName"));
             portalManager.setPortalName(name, newName, player);
         };
     }
 
     private static PlayerCommandExecutor listPortals(PortalManager portalManager) {
-        return (player, _) -> portalManager.getPortals().thenAccept(portals -> {
+        return (player, _) -> portalManager.getPortals().thenAcceptAsync(portals -> {
             player.sendMessage("§6=== Portals ===");
             for (var portal : portals) {
                 var world = Bukkit.getWorld(portal.getWorld());
@@ -158,36 +165,34 @@ public class PortalCommand extends BaseCommand {
         });
     }
 
-    /// Handles the `/portal <name> edit location` command
+    /// Handles the `/portal edit <name> location` command
     private static PlayerCommandExecutor movePortal(PortalManager portalManager) {
         return (player, args) -> {
-            String name = Objects.requireNonNull(args.getRaw("name"));
+            var name = getName(args);
             var p1 = parsePosition(args, "x1", "y1", "z1");
             var p2 = parsePosition(args, "x2", "y2", "z2");
             portalManager.movePortal(name, p1, p2, player);
         };
     }
 
-    /// Handles the `/portal <name> delete` command
+    /// Handles the `/portal delete <name>` command
     private static PlayerCommandExecutor deletePortal(PortalManager portalManager) {
-        return (player, args) -> {
-            String name = args.getRaw("name");
-            if (name == null) {
-                player.sendMessage("Usage: /portal <name> delete");
-                return;
-            }
-            portalManager.deletePortal(name, player);
-        };
+        return (player, args) -> portalManager.deletePortal(getName(args), player);
     }
 
-    /// Handles the `/portal <name> create` command
+    /// Handles the `/portal create <name> ...` command
     private static PlayerCommandExecutor createPortal(PortalManager portalManager) {
         return (player, args) -> {
-            String name = Objects.requireNonNull(args.getRaw("name"));
+            var name = getName(args);
             var p1 = parsePosition(args, "x1", "y1", "z1");
             var p2 = parsePosition(args, "x2", "y2", "z2");
             portalManager.createPortal(name, p1, p2, player);
         };
+    }
+
+    /// Reads the parsed `name` argument (getRaw would keep quotes around quoted names)
+    private static String getName(CommandArguments args) {
+        return (String) Objects.requireNonNull(args.get("name"));
     }
 
     /// parse the 3 positional arguments

@@ -35,7 +35,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         if (!player.hasPlayedBefore()) {
-            withSpawnLocation(player::teleport);
+            withSpawnLocation(player::teleportAsync);
         }
     }
 
@@ -52,7 +52,7 @@ public class PlayerListener implements Listener {
     /// Performs the action with the spawn portal's exit location
     private void withSpawnLocation(Consumer<Location> action) {
         portalManager.getSpawnPortal()
-                .thenAccept(portal -> portal.map(Portal::getExit).ifPresent(action))
+                .thenAcceptAsync(portal -> portal.map(Portal::getExit).ifPresent(action))
                 .exceptionally(_ -> null);
     }
 
@@ -68,10 +68,10 @@ public class PlayerListener implements Listener {
             return;
         }
 
-        portalManager.checkMovedIntoPortal(event).thenAccept(portal -> {
+        portalManager.checkMovedIntoPortal(event).thenAcceptAsync(portal -> {
             if (portal.isPresent()) {
                 var player = event.getPlayer();
-                var dialog = PortalGuiFactory.getDialog(portal.get(), (target) -> player.teleport(target.getExit()),
+                var dialog = PortalGuiFactory.getDialog(portal.get(), (target) -> player.teleportAsync(target.getExit()),
                         player);
                 player.getScheduler().run(plugin, _ -> player.showDialog(dialog), null);
             }

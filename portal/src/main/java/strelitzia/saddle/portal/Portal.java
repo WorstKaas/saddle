@@ -4,26 +4,30 @@
 
 package strelitzia.saddle.portal;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.player.PlayerMoveEvent;
 import strelitzia.saddle.portal.config.PortalConfigProvider;
 import strelitzia.saddle.portal.effect.PortalEffect;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 /// Represents a portal that players can use to warp between locations
 @Data
-public class Portal {
+@NoArgsConstructor(access = AccessLevel.PROTECTED) //required for jackson deserialization
+public class Portal implements Serializable {
 
-    private final UUID id = UUID.randomUUID();
+    private UUID id = UUID.randomUUID();
     private UUID world;
     private PortalCorner min;
     private PortalCorner max;
-    private Location exit;
-    private PortalEffect effect;
+    private PortalExit exit;
+    private String effectType;
     private String icon;
     private boolean isSpawn;
     private String name;
@@ -32,12 +36,27 @@ public class Portal {
         this.name = name;
         setLocation(location1, location2, world);
         var config = PortalConfigProvider.get();
-        this.effect = PortalEffect.fromType(config.getDefaultEffect());
+        this.effectType = config.getDefaultEffect();
         this.icon = config.getDefaultIcon();
-        this.exit = new Location(world,
+        this.exit = new PortalExit(
                 (double) (min.x() + max.x()) / 2,
-                (double) (min.y() + max.z()) / 2,
-                (double) (min.z() + max.z()) / 2);
+                (double) (min.y() + max.y()) / 2,
+                (double) (min.z() + max.z()) / 2, 0, 0);
+    }
+
+    public Location getExit() {
+        return exit.toLocation(world);
+    }
+
+    /// Gets the portal effect based on the stored effect type
+    /// Named to avoid Jackson treating it as a property getter
+    public PortalEffect effect() {
+        return PortalEffect.fromType(effectType);
+    }
+
+    /// Sets the effect by storing its type
+    public void applyEffect(PortalEffect effect) {
+        this.effectType = effect != null ? effect.getType() : null;
     }
 
     public void setLocation(PortalCorner location1, PortalCorner location2, World world) {
@@ -54,11 +73,11 @@ public class Portal {
                 world.getName()));
     }
 
-    public void setExit(Location location) {
-        if (exit.getWorld() != location.getWorld()) {
+    public void updateExitLocation(Location location) {
+        if (!Objects.equals(location.getWorld().getUID(), world)) {
             throw new IllegalArgumentException("Location must be in the same world as the portal");
         }
-        this.exit = location.clone();
+        this.exit = new PortalExit(location);
         PortalPlugin.getInstance().getLogger().info("Moved portal %s exit to %s".formatted(name, location));
     }
 
@@ -67,7 +86,7 @@ public class Portal {
     /// @param event the player movement event to check
     /// @return true if the location is within the portal zone, false otherwise
     public boolean movedIntoZone(PlayerMoveEvent event) {
-        if (Objects.equals(event.getTo().getWorld().getUID(), world)) {
+        if (!Objects.equals(event.getTo().getWorld().getUID(), world)) {
             return false;
         }
         return !isInZone(event.getFrom()) && isInZone(event.getTo());

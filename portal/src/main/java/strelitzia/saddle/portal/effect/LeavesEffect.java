@@ -12,6 +12,10 @@ public class LeavesEffect extends PortalEffect {
     @Override
     void display(Portal portal) {
         super.displayParticles(portal, Particle.CHERRY_LEAVES);
+    }
 
+    @Override
+    public String getType() {
+        return "leaves";
     }
 }

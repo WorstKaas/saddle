@@ -32,11 +32,11 @@ public class ParticleEffectManager {
     /// Displays particle effects for all portals
     /// Runs asynchronously and schedules particle display on appropriate region schedulers
     private void displayEffects() {
-        portalRepository.getAll().thenAccept(portals -> {
+        portalRepository.getAll().thenAcceptAsync(portals -> {
             for (Map.Entry<String, Portal> entry : portals.entrySet()) {
                 var portal = entry.getValue();
                 plugin.getServer().getRegionScheduler().execute(plugin, portal.getExit(), () ->
-                    portal.getEffect().display(portal)
+                    portal.effect().display(portal)
                 );
             }
         }).exceptionally(_ -> null);

@@ -12,7 +12,10 @@ public class WaterEffect extends PortalEffect {
     @Override
     void display(Portal portal) {
         super.displayParticles(portal, Particle.FALLING_WATER);
+    }
 
-
+    @Override
+    public String getType() {
+        return "water";
     }
 }

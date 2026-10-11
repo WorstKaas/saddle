@@ -1,6 +1,6 @@
 main: strelitzia.saddle.command.rules.RulesPlugin
-name: RulesCommand
-version: ${VERSION}
+name: saddle.rules
+version: ${version}
 api-version: "26.2"
 folia-supported: true
 author: AUTHOR

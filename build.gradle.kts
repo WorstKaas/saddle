@@ -1,6 +1,5 @@
 /*
- * Copyright (c) ${year} Strelitzia. All rights reserved.
- *
+ * Copyright 2026 Strelitzia. All rights reserved.
  */
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -97,6 +96,7 @@ subprojects {
             isTransitive = false
         }
         implementation("org.hibernate.validator:hibernate-validator:9.1.4.Final")
+        compileOnly("de.bluecolored:bluemap-api:2.7.7")
 
         testImplementation("org.mockito:mockito-core:5.24.0")
         mockitoAgent("org.mockito:mockito-core:5.24.0") { isTransitive = false }

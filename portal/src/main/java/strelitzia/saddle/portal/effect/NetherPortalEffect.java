@@ -12,6 +12,10 @@ public class NetherPortalEffect extends PortalEffect {
     @Override
     void display(Portal portal) {
         super.displayParticles(portal, Particle.PORTAL);
+    }
 
+    @Override
+    public String getType() {
+        return "portal";
     }
 }

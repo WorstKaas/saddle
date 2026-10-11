@@ -59,10 +59,14 @@ public class BlueMapIntegration {
             return;
         }
 
-        portalRepository.getAll().thenAccept(portals -> {
+        portalRepository.getAll().thenAcceptAsync(portals -> {
 
             for (var entry : portals.entrySet()) {
                 var portal = entry.getValue();
+
+                if (portal.getExit() == null) {
+                    continue;
+                }
 
                 api.getWorld(portal.getExit().getWorld()).ifPresent(world -> {
                     var marker = POIMarker
