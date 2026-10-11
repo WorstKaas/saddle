@@ -61,21 +61,23 @@ public final class PortalPlugin extends JavaPlugin {
 
         autoFlushTask = new FoliaFlushTask(store, this).start();
 
-        var portalRepository = store.repository("portals", Portal.class, KeySerializers.forString());
-        var favouriteRepository = store.repository("favourites", FavouritePortals.class, KeySerializers.forUuid());
+        var portalRepository = store.repository("saddle.portal.portals", Portal.class, KeySerializers.forString());
+        var favouriteRepository = store.repository("saddle.portal.favourites", FavouritePortals.class,
+                KeySerializers.forUuid());
 
-        var portalManager = new PortalManager(portalRepository, favouriteRepository);
+        var blueMapIntegration = new BlueMapIntegration(this, portalRepository);
+        blueMapIntegration.initialize();
+
+        var portalManager = new PortalManager(portalRepository, favouriteRepository, blueMapIntegration);
         PortalGuiFactory.init(portalManager);
 
         var particleEffectManager = new ParticleEffectManager(this, portalRepository);
         particleTask = particleEffectManager.start();
 
-        var blueMapIntegration = new BlueMapIntegration(this, portalRepository);
-        blueMapIntegration.initialize();
 
         getServer().getPluginManager().registerEvents(new PlayerListener(portalManager, this), this);
 
-        new PortalCommand(portalManager, blueMapIntegration).register();
+        new PortalCommand(portalManager).register();
 
         getLogger().info("PortalPlugin has been enabled");
     }

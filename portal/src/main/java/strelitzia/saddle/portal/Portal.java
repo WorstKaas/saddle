@@ -29,7 +29,6 @@ public class Portal {
     private String name;
 
     public Portal(PortalCorner location1, PortalCorner location2, String name, World world) {
-        PortalPlugin.getInstance().getLogger().info("Creating portal " + name);
         this.name = name;
         setLocation(location1, location2, world);
         var config = PortalConfigProvider.get();
@@ -39,8 +38,6 @@ public class Portal {
                 (double) (min.x() + max.x()) / 2,
                 (double) (min.y() + max.z()) / 2,
                 (double) (min.z() + max.z()) / 2);
-        PortalPlugin.getInstance().getLogger().info("Created portal " + name);
-
     }
 
     public void setLocation(PortalCorner location1, PortalCorner location2, World world) {

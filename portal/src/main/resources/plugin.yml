@@ -1,5 +1,5 @@
 main: strelitzia.saddle.portal.PortalPlugin
-name: PortalCommand
+name: saddle.portal
 version: ${VERSION}
 api-version: "26.2"
 folia-supported: true

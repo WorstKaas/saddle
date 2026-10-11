@@ -19,6 +19,8 @@ import strelitzia.saddle.portal.Portal;
 @RequiredArgsConstructor
 public class BlueMapIntegration {
 
+    private boolean isEnabled = false;
+
     /// The plugin instance
     private final Plugin plugin;
     private final Repository<String, Portal> portalRepository;
@@ -30,16 +32,19 @@ public class BlueMapIntegration {
     /// Adds markers immediately if BlueMap is already enabled
     public void initialize() {
         BlueMapAPI.onEnable(api -> {
+            isEnabled = true;
             plugin.getLogger().info("BlueMap API detected, adding portal markers...");
             updateMarkers(api);
         });
 
         BlueMapAPI.onDisable(api -> {
+            isEnabled = false;
             plugin.getLogger().info("BlueMap API disabled, removing portal markers...");
             removeMarkers(api);
         });
 
         BlueMapAPI.getInstance().ifPresent(api -> {
+            isEnabled = true;
             plugin.getLogger().info("BlueMap API already enabled, adding portal markers...");
             updateMarkers(api);
         });
@@ -50,6 +55,10 @@ public class BlueMapIntegration {
     ///
     /// @param api the BlueMap API instance
     private void updateMarkers(BlueMapAPI api) {
+        if (!isEnabled) {
+            return;
+        }
+
         portalRepository.getAll().thenAccept(portals -> {
 
             for (var entry : portals.entrySet()) {

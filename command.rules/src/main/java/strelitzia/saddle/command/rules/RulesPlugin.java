@@ -34,8 +34,6 @@ public final class RulesPlugin extends JavaPlugin {
         RulesConfigProvider.init(this);
         try {
             store = new BukkitDataStoreBuilder(getName(), getDataFolder()).build();
-
-
         } catch (IOException e) {
             getLogger().severe("Failed to open data store: " + e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
@@ -43,6 +41,7 @@ public final class RulesPlugin extends JavaPlugin {
         }
 
         autoFlushTask = new FoliaFlushTask(store, this).start();
+
         var playerDataRepository = store.repository("has-accepted", Boolean.class, KeySerializers.forUuid());
         var manager = new PlayerDataManager<>(playerDataRepository, this).registerEvents();
 

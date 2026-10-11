@@ -9,6 +9,8 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
 
+import java.util.concurrent.TimeUnit;
+
 /// Folia-compatible flush task for automatically persisting data store changes
 /// Runs on the global region scheduler to flush data every second
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class FoliaFlushTask {
     /// Starts the scheduled flush task
     /// @return the ScheduledTask that can be cancelled if needed
     public ScheduledTask start() {
-        return plugin.getServer().getGlobalRegionScheduler()
-                .runAtFixedRate(plugin, _ -> store.flush(), 1000L, 1000L);
+        return plugin.getServer().getAsyncScheduler()
+                .runAtFixedRate(plugin,_ -> store.flush(),10, 10, TimeUnit.SECONDS);
     }
 }

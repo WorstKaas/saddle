@@ -10,6 +10,8 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
 
+import java.util.concurrent.TimeUnit;
+
 /// Folia compatible flush task based on [AutoFlushTask]
 @RequiredArgsConstructor
 public class FoliaFlushTask {
@@ -22,8 +24,8 @@ public class FoliaFlushTask {
     private final Plugin plugin;
 
     public ScheduledTask start() {
-        return plugin.getServer().getGlobalRegionScheduler()
-                .runAtFixedRate(plugin,_ -> store.flush(),1000L, 1000L);
+        return plugin.getServer().getAsyncScheduler()
+                .runAtFixedRate(plugin,_ -> store.flush(),10, 10, TimeUnit.SECONDS);
     }
 
 }
