@@ -5,24 +5,32 @@
 package strelitzia.saddle.portal.effect;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import lombok.experimental.UtilityClass;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import strelitzia.saddle.portal.Portal;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-/// Utility class for displaying particles around a portal
-@UtilityClass
-public class ParticleEmitter {
+/// Portal effect spawning in the area of the portal of the given type
+@RequiredArgsConstructor
+public class ParticlePortal extends PortalEffect {
 
     private static final int MAX_PARTICLES = 2000;
+
+    private final Particle particle;
+    private final double density;
+    @Getter(onMethod_ = {@Override})
+    private final Sound sound;
 
     @SuppressFBWarnings(
             value = "PREDICTABLE_RANDOM",
             justification = "False positive: ThreadLocalRandom is used for non-security-sensitive purposes."
     )
-    static void emit(Portal portal, Particle particle, double density) {
+    @Override
+    public void display(Portal portal) {
         var world = Bukkit.getWorld(portal.getWorld());
         if (world == null) {
             return;
@@ -86,4 +94,5 @@ public class ParticleEmitter {
         int whole = (int) value;
         return random.nextDouble() < (value - whole) ? whole + 1 : whole;
     }
+
 }

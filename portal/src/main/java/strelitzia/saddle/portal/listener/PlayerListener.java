@@ -8,6 +8,7 @@ import com.destroystokyo.paper.event.player.PlayerSetSpawnEvent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,6 +23,7 @@ import strelitzia.saddle.portal.PortalManager;
 import strelitzia.saddle.portal.PortalPlugin;
 import strelitzia.saddle.portal.gui.PortalGuiFactory;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /// Listener for player events related to portal operations
@@ -30,8 +32,8 @@ public class PlayerListener implements Listener {
 
     private final PortalManager portalManager;
     private final PortalPlugin plugin;
-    private static final NamespacedKey KEY = new NamespacedKey(PortalPlugin.getInstance().getName(),
-            "portal_respawn_location");
+    private static final NamespacedKey KEY =
+            new NamespacedKey(PortalPlugin.getInstance().getName(), "portal_respawn_location");
 
     /// Attempt to spawn players to the Spawn portal upon first join
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -71,9 +73,7 @@ public class PlayerListener implements Listener {
 
     /// Performs the action with the spawn portal's exit location
     private void withSpawnLocation(Consumer<Location> action) {
-        portalManager.getSpawnPortal()
-                .map(Portal::getExit)
-                .ifPresent(action);
+        portalManager.getSpawnPortal().map(Portal::getExit).ifPresent(action);
     }
 
     /// Handles player movement events to detect portal zone entry
@@ -91,10 +91,39 @@ public class PlayerListener implements Listener {
         portalManager.checkMovedIntoPortal(event).thenAcceptAsync(portal -> {
             if (portal.isPresent()) {
                 var player = event.getPlayer();
-                var dialog = PortalGuiFactory.getDialog(portal.get(), (target) -> player.teleportAsync(target.getExit()),
-                        player);
+                var dialog = PortalGuiFactory.getDialog(portal.get(), warp(player), player);
                 player.getScheduler().run(plugin, _ -> player.showDialog(dialog), null);
             }
         });
     }
+
+    /// warp the player, any ridden objects and leashed entities to the portal
+    /// due to async stuff, we cannot guarantee that the player and leashed entities will exist in the same world
+    /// therefore, we unleash, wait till everyone has warped, and leash again
+    private Consumer<Portal> warp(Player player) {
+        return portal -> {
+            var leashedEntities = player.getWorld().getEntities().stream()
+                    .filter(e -> e instanceof LivingEntity le && le.isLeashed() && le.getLeashHolder() == player)
+                    .map(LivingEntity.class::cast)
+                    .peek(e -> e.setLeashHolder(null))
+                    .toList();
+            Objects.requireNonNullElse(player.getVehicle(), player).teleportAsync(portal.getExit()).thenRunAsync(() -> {
+                // warp entities
+                leashedEntities.forEach(
+                        it -> it.teleportAsync(portal.getExit()).thenRunAsync(() -> it.setLeashHolder(player)));
+
+                // play portal exit effect
+                var loc = player.getLocation();
+                for (var p : player.getLocation().getWorld().getPlayers()) {
+                    if (p.getLocation().distanceSquared(loc) <= 20 * 20) {
+                        var sound = portal.effect().getSound();
+                        if (sound != null) {
+                            p.playSound(loc, sound, 1.0f, 1.0f);
+                        }
+                    }
+                }
+            });
+        };
+    }
+
 }
