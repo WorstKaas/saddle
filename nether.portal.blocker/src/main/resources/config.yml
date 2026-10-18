@@ -1,0 +1,2 @@
+blocked_border: "Prevented portal creation as you would exit outside the overworld border"
+blocked_claim: "Prevented portal creation as you would exit in a claimed homestead chunk"

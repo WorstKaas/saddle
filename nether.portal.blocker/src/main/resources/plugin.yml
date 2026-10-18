@@ -1,0 +1,8 @@
+main: strelitzia.saddle.nether.portal.blocker
+name: saddle.portal
+version: 1.0.0
+api-version: "26.2"
+folia-supported: true
+author: Strelitzia
+description: Block portals if they would be generated outside the world border or in a claimed homestead chunk
+softdepend: [Homestead]
