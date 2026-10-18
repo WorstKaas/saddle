@@ -62,12 +62,14 @@ public class PortalManager {
 
     /// Sets the effect for a portal
     public void setEffect(String portalName, String effect, Player player) {
-        portalRepository.get(portalName).thenAcceptAsync(portal -> {
-            if (portal.isPresent()) {
-                portal.get().applyEffect(PortalEffect.fromType(effect));
-                portalRepository.put(portalName, portal.get());
-                portalCache.put(portalName, portal.get());
-                PlayerMessager.send(player, "Portal %s effect set to %s", portalName, portal.get().effect());
+        portalRepository.get(portalName).thenAcceptAsync(oPortal -> {
+            if (oPortal.isPresent()) {
+                var portal = oPortal.get();
+                portal.applyEffect(PortalEffect.fromType(effect));
+                portalCache.put(portalName, portal);
+                portalRepository.put(portalName, portal).thenRunAsync(() -> {
+                    PlayerMessager.send(player, "Portal %s effect set to %s", portalName, portal.effect());
+                });
             } else {
                 PlayerMessager.send(player, "Portal %s not found", portalName);
             }
@@ -90,9 +92,7 @@ public class PortalManager {
 
     /// Refreshes all markers in blueMap
     public void refreshMarkers() {
-        if (blueMap != null) {
-            blueMap.refreshMarkers();
-        }
+        mapIntegrations.forEach(MapIntegration::refreshMarkers);
     }
 
     /// Sets a portal as the spawn portal, ensuring only one spawn exists
@@ -147,9 +147,7 @@ public class PortalManager {
             portal.setName(newName);
             portalRepository.put(newName, portal);
             portalCache.put(newName, portal);
-            if (blueMap != null) {
-                blueMap.refreshMarkers();
-            }
+            mapIntegrations.forEach(MapIntegration::refreshMarkers);
             PlayerMessager.send(player, "Portal %s renamed to %s", portalName, newName);
         });
     }
@@ -159,9 +157,7 @@ public class PortalManager {
             if (portal.isPresent()) {
                 portalRepository.delete(portalName);
                 portalCache.remove(portalName);
-                if (blueMap != null) {
-                    blueMap.refreshMarkers();
-                }
+                mapIntegrations.forEach(MapIntegration::refreshMarkers);
                 PlayerMessager.send(player, "Portal %s has been deleted", portalName);
             } else {
                 PlayerMessager.send(player, "Portal %s not found", portalName);
@@ -188,9 +184,7 @@ public class PortalManager {
         }).thenAcceptAsync(_ -> {
             PortalPlugin.getInstance().getLogger().info("Saved portal " + portalName);
             PlayerMessager.send(player, "Created portal %s", portalName);
-            if (blueMap != null) {
-                blueMap.refreshMarkers();
-            }
+            mapIntegrations.forEach(MapIntegration::refreshMarkers);
         }).exceptionally(e -> {
             PortalPlugin.getInstance().getLogger().severe("Failed to create portal: " + e.getMessage());
             e.printStackTrace();
@@ -204,9 +198,7 @@ public class PortalManager {
                 portal.get().setLocation(p1, p2, player.getWorld());
                 portalRepository.put(portalName, portal.get());
                 portalCache.put(portalName, portal.get());
-                if (blueMap != null) {
-                    blueMap.refreshMarkers();
-                }
+                mapIntegrations.forEach(MapIntegration::refreshMarkers);
                 PlayerMessager.send(player, "Portal %s has been moved to %s", p1, p2);
             } else {
                 PlayerMessager.send(player, "Portal %s not found", portalName);

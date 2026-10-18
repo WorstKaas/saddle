@@ -1,9 +1,9 @@
 main: strelitzia.saddle.command.rules.RulesPlugin
 name: saddle.rules
-version: ${version}
+version: 1.0.1
 api-version: "26.2"
 folia-supported: true
-author: AUTHOR
+author: Strelitzia
 description: Display server rules with a full-screen GUI
 commands:
   rules:

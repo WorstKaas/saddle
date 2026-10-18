@@ -4,7 +4,6 @@
 
 package strelitzia.saddle.portal.integration;
 
-import com.crimsonwarpedcraft.cwcommons.store.Repository;
 import com.flowpowered.math.vector.Vector3d;
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.BlueMapMap;
@@ -12,7 +11,6 @@ import de.bluecolored.bluemap.api.markers.MarkerSet;
 import de.bluecolored.bluemap.api.markers.POIMarker;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
-import strelitzia.saddle.portal.Portal;
 import strelitzia.saddle.portal.PortalManager;
 
 import java.io.IOException;
@@ -38,9 +36,9 @@ public class BlueMapIntegration implements MapIntegration {
     /// Returns null if BlueMap plugin is not installed or API classes are not available
     ///
     /// @param plugin the plugin instance
-    /// @param portalRepository the portal repository
+    /// @param portalManager the portal manager
     @Override
-    public void initialize(Plugin plugin, Repository<String, Portal> portalRepository) {
+    public void initialize(Plugin plugin, PortalManager portalManager) {
         if (plugin.getServer().getPluginManager().getPlugin("BlueMap") == null) {
             plugin.getLogger().info("BlueMap not found - integration disabled");
             return;
@@ -79,20 +77,15 @@ public class BlueMapIntegration implements MapIntegration {
         }
     }
 
-    /// Initializes the BlueMap integration
-    /// Registers listeners for BlueMap API enable/disable events
-    /// Adds markers immediately if BlueMap is already enabled
-    private void initialize() {
-
-    }
-
-
     private void registerEnderPearlIcon(BlueMapAPI api) throws IOException {
         Path iconPath = api.getWebApp()
                 .getWebRoot()
                 .resolve("assets/ender_pearl.png");
 
-        Files.createDirectories(iconPath.getParent());
+        Path parentDir = iconPath.getParent();
+        if (parentDir != null) {
+            Files.createDirectories(parentDir);
+        }
 
         try (var input = getClass().getResourceAsStream("/icons/ender_pearl.png")) {
             if (input == null) {

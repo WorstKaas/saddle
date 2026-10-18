@@ -1,9 +1,9 @@
 main: strelitzia.saddle.command.map.Map
-name: MapCommand
+name: Saddle.MapCommand
 version: ${VERSION}
 api-version: "26.2"
 folia-supported: true
-author: AUTHOR
+author: Strelitzia
 description: DESCRIPTION
 permissions:
   map.use:

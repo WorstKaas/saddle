@@ -102,15 +102,30 @@ public class PlayerListener implements Listener {
     /// therefore, we unleash, wait till everyone has warped, and leash again
     private Consumer<Portal> warp(Player player) {
         return portal -> {
+            // Schedule entity operations on their own region threads to avoid thread violations
             var leashedEntities = player.getWorld().getEntities().stream()
-                    .filter(e -> e instanceof LivingEntity le && le.isLeashed() && le.getLeashHolder() == player)
+                    .filter(e -> e instanceof LivingEntity)
                     .map(LivingEntity.class::cast)
-                    .peek(e -> e.setLeashHolder(null))
+                    .filter(le -> {
+                        try {
+                            return le.isLeashed() && le.getLeashHolder() == player;
+                        } catch (Exception e) {
+                            // Entity may be on a different thread, skip it
+                            return false;
+                        }
+                    })
                     .toList();
+
+            for (var entity : leashedEntities) {
+                entity.getScheduler().run(plugin, _ -> entity.setLeashHolder(null), null);
+            }
+
             Objects.requireNonNullElse(player.getVehicle(), player).teleportAsync(portal.getExit()).thenRunAsync(() -> {
                 // warp entities
                 leashedEntities.forEach(
-                        it -> it.teleportAsync(portal.getExit()).thenRunAsync(() -> it.setLeashHolder(player)));
+                        it -> it.teleportAsync(portal.getExit()).thenRunAsync(() -> {
+                            it.getScheduler().run(plugin, _ -> it.setLeashHolder(player), null);
+                        }));
 
                 // play portal exit effect
                 var loc = player.getLocation();

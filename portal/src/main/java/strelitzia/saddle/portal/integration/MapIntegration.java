@@ -4,17 +4,16 @@
 
 package strelitzia.saddle.portal.integration;
 
-import com.crimsonwarpedcraft.cwcommons.store.Repository;
 import org.bukkit.plugin.Plugin;
-import strelitzia.saddle.portal.Portal;
+import strelitzia.saddle.portal.PortalManager;
 
 public interface MapIntegration {
 
     /// create an instance of the map integration if the corresponding map plugin can be found
     ///
     /// @param plugin the plugin instance
-    /// @param portalRepository the portal repository where the integration should register itself
-    void initialize(Plugin plugin, Repository<String, Portal> portalRepository);
+    /// @param portalManager the portal manager where the integration should register itself
+    void initialize(Plugin plugin, PortalManager portalManager);
 
     /// Refreshes portal markers if BlueMap is available
     /// Called when portals are created, deleted, or modified

@@ -19,6 +19,7 @@ import strelitzia.saddle.portal.config.PortalConfigProvider;
 import strelitzia.saddle.portal.effect.ParticleEffectScheduler;
 import strelitzia.saddle.portal.gui.PortalGuiFactory;
 import strelitzia.saddle.portal.integration.BlueMapIntegration;
+import strelitzia.saddle.portal.integration.Pl3xMapIntegration;
 import strelitzia.saddle.portal.listener.PlayerListener;
 
 import java.io.IOException;
@@ -71,7 +72,17 @@ public final class PortalPlugin extends JavaPlugin {
         var portalManager = new PortalManager(portalRepository, favouriteRepository);
 
 
-        new BlueMapIntegration(this, portalRepository, portalManager).initialize(this, portalRepository);
+        new BlueMapIntegration(this, portalManager).initialize(this, portalManager);
+        
+        // Only initialize Pl3xMap integration if the plugin is available
+        if (getServer().getPluginManager().isPluginEnabled("Pl3xMap")) {
+            try {
+                Class.forName("net.pl3x.map.core.Pl3xMap");
+                new Pl3xMapIntegration(portalManager).initialize(this, portalManager);
+            } catch (ClassNotFoundException e) {
+                getLogger().warning("Pl3xMap plugin found but API classes not available - Pl3xMap integration disabled");
+            }
+        }
 
         PortalGuiFactory.init(portalManager);
 

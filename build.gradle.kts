@@ -15,7 +15,7 @@ plugins {
     java
 }
 
-group = "com.crimsonwarpedcraft.exampleplugin"
+group = "strelitzia.saddle"
 
 fun getTime(): String {
     val sdf = SimpleDateFormat("yyMMdd-HHmm")
@@ -173,9 +173,13 @@ configurations.named("integrationTestImplementation") {
     extendsFrom(configurations.implementation.get())
 }
 
-tasks.processResources {
-    filesMatching("**/plugin.yml") {
-        expand(mapOf("NAME" to rootProject.name, "VERSION" to version, "PACKAGE" to project.group))
+subprojects {
+    tasks.processResources {
+        filesMatching("**/plugin.yml") {
+            expand(mapOf(
+                "VERSION" to project.version,
+            ))
+        }
     }
 }
 

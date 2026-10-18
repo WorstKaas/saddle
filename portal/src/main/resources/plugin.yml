@@ -1,11 +1,11 @@
 main: strelitzia.saddle.portal.PortalPlugin
 name: saddle.portal
-version: ${version}
+version: ${VERSION}
 api-version: "26.2"
 folia-supported: true
-author: AUTHOR
+author: Strelitzia
 description: Warp between pre-defined portals with particle effects
-softdepend: [BlueMap]
+softdepend: [BlueMap, Pl3xMap]
 commands:
   portal:
     description: Manage portals
