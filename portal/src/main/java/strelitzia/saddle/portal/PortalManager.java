@@ -9,9 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import strelitzia.saddle.portal.effect.PortalEffect;
-import strelitzia.saddle.portal.integration.BlueMapIntegration;
+import strelitzia.saddle.portal.integration.MapIntegration;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +27,7 @@ public class PortalManager {
 
     private final Repository<String, Portal> portalRepository;
     private final Repository<UUID, FavouritePortals> favouriteRepository;
-    private final BlueMapIntegration blueMap;
+    private final List<MapIntegration> mapIntegrations = new ArrayList<>();
     private final Map<String, Portal> portalCache = new ConcurrentHashMap<>();
 
     /// @return The current main spawn portal, or empty if none exists
@@ -40,12 +42,22 @@ public class PortalManager {
                 portal.get().setIcon(icon);
                 portalRepository.put(portalName, portal.get());
                 portalCache.put(portalName, portal.get());
-                blueMap.refreshMarkers();
+                mapIntegrations.forEach(MapIntegration::refreshMarkers);
                 PlayerMessager.send(player, "Portal %s icon set to %s", portalName, icon);
             } else {
                 PlayerMessager.send(player, "Portal %s not found", portalName);
             }
         });
+    }
+
+    ///  registers a new map integration
+    public void registerMapIntegration(MapIntegration mapIntegration) {
+        mapIntegrations.add(mapIntegration);
+    }
+
+    /// deregisters a map integration
+    public void deregisterMapIntegration(MapIntegration integration) {
+        mapIntegrations.remove(integration);
     }
 
     /// Sets the effect for a portal
@@ -78,7 +90,9 @@ public class PortalManager {
 
     /// Refreshes all markers in blueMap
     public void refreshMarkers() {
-        blueMap.refreshMarkers();
+        if (blueMap != null) {
+            blueMap.refreshMarkers();
+        }
     }
 
     /// Sets a portal as the spawn portal, ensuring only one spawn exists
@@ -133,7 +147,9 @@ public class PortalManager {
             portal.setName(newName);
             portalRepository.put(newName, portal);
             portalCache.put(newName, portal);
-            blueMap.refreshMarkers();
+            if (blueMap != null) {
+                blueMap.refreshMarkers();
+            }
             PlayerMessager.send(player, "Portal %s renamed to %s", portalName, newName);
         });
     }
@@ -143,7 +159,9 @@ public class PortalManager {
             if (portal.isPresent()) {
                 portalRepository.delete(portalName);
                 portalCache.remove(portalName);
-                blueMap.refreshMarkers();
+                if (blueMap != null) {
+                    blueMap.refreshMarkers();
+                }
                 PlayerMessager.send(player, "Portal %s has been deleted", portalName);
             } else {
                 PlayerMessager.send(player, "Portal %s not found", portalName);
@@ -170,7 +188,9 @@ public class PortalManager {
         }).thenAcceptAsync(_ -> {
             PortalPlugin.getInstance().getLogger().info("Saved portal " + portalName);
             PlayerMessager.send(player, "Created portal %s", portalName);
-            blueMap.refreshMarkers();
+            if (blueMap != null) {
+                blueMap.refreshMarkers();
+            }
         }).exceptionally(e -> {
             PortalPlugin.getInstance().getLogger().severe("Failed to create portal: " + e.getMessage());
             e.printStackTrace();
@@ -184,7 +204,9 @@ public class PortalManager {
                 portal.get().setLocation(p1, p2, player.getWorld());
                 portalRepository.put(portalName, portal.get());
                 portalCache.put(portalName, portal.get());
-                blueMap.refreshMarkers();
+                if (blueMap != null) {
+                    blueMap.refreshMarkers();
+                }
                 PlayerMessager.send(player, "Portal %s has been moved to %s", p1, p2);
             } else {
                 PlayerMessager.send(player, "Portal %s not found", portalName);

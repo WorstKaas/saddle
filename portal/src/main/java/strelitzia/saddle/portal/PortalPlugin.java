@@ -68,10 +68,11 @@ public final class PortalPlugin extends JavaPlugin {
         var favouriteRepository = store.repository("saddle.portal.favourites", FavouritePortals.class,
                 KeySerializers.forUuid());
 
-        var blueMapIntegration = new BlueMapIntegration(this, portalRepository);
-        blueMapIntegration.initialize();
+        var portalManager = new PortalManager(portalRepository, favouriteRepository);
 
-        var portalManager = new PortalManager(portalRepository, favouriteRepository, blueMapIntegration);
+
+        new BlueMapIntegration(this, portalRepository, portalManager).initialize(this, portalRepository);
+
         PortalGuiFactory.init(portalManager);
 
         var particleEffectManager = new ParticleEffectScheduler(this, portalRepository);
