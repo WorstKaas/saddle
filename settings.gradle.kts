@@ -7,3 +7,4 @@ rootProject.name = "saddle"
 include("command.map")
 include("command.rules")
 include("portal")
+include("nether.portal.blocker")
