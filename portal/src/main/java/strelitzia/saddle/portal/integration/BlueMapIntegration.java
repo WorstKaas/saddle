@@ -14,6 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
 import strelitzia.saddle.portal.Portal;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
 /// Integration with BlueMap web map for displaying portal markers
 /// Adds POI markers for all portals on the web map and updates them when portals change
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ public class BlueMapIntegration {
     private final Repository<String, Portal> portalRepository;
     private static final String MARKER_SET_ID = "portals";
     private static final String MARKER_SET_LABEL = "Portals";
+    private String enderPearlIcon;
 
     /// Initializes the BlueMap integration
     /// Registers listeners for BlueMap API enable/disable events
@@ -35,7 +41,11 @@ public class BlueMapIntegration {
             isEnabled = true;
             plugin.getLogger().info("BlueMap API detected, adding portal markers...");
             updateMarkers(api);
-        });
+            try {
+                registerEnderPearlIcon(api);
+            } catch (IOException e) {
+                plugin.getLogger().severe("Failed to register ender pearl icon: " + e.getMessage());
+            }        });
 
         BlueMapAPI.onDisable(api -> {
             isEnabled = false;
@@ -48,6 +58,25 @@ public class BlueMapIntegration {
             plugin.getLogger().info("BlueMap API already enabled, adding portal markers...");
             updateMarkers(api);
         });
+    }
+
+
+    private void registerEnderPearlIcon(BlueMapAPI api) throws IOException {
+        Path iconPath = api.getWebApp()
+                .getWebRoot()
+                .resolve("assets/ender_pearl.png");
+
+        Files.createDirectories(iconPath.getParent());
+
+        try (var input = getClass().getResourceAsStream("/icons/ender_pearl.png")) {
+            if (input == null) {
+                throw new IOException("Missing resource: /icons/ender_pearl.png");
+            }
+
+            Files.copy(input, iconPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        enderPearlIcon = "assets/ender_pearl.png";
     }
 
     /// Updates portal markers on the BlueMap web map
@@ -73,8 +102,8 @@ public class BlueMapIntegration {
                             .builder()
                             .label(portal.getName())
                             .position(new Vector3d(portal.getExit().x(), portal.getExit().y(), portal.getExit().z()))
-                            .icon(portal.getIcon(), -8, -8)
-                            .maxDistance(1000)
+                            .icon(enderPearlIcon, -8, -8)
+                            .maxDistance(99999999)
                             .build();
 
                     for (var map : world.getMaps()) {
