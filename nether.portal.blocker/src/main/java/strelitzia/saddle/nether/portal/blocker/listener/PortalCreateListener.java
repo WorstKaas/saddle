@@ -24,8 +24,9 @@ public class PortalCreateListener implements Listener {
 
     /// Handles portal creation events
     /// Cancels the event if the portal would be outside the world border or in a claimed homestead chunk
-    @EventHandler(priority = EventPriority.HIGHEST)
+     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPortalCreate(PortalCreateEvent event) {
+        plugin.getLogger().info("PortalCreateEvent: " + event.getBlocks());
         if (event.getWorld().getEnvironment() != World.Environment.NORMAL) {
             return;
         }
@@ -53,8 +54,8 @@ public class PortalCreateListener implements Listener {
             var x = block.getX();
             var z = block.getZ();
 
-            if (x > center.getX() + size || x < center.getX() - size ||
-                    z > center.getZ() + size || z < center.getZ() - size) {
+            if (x < center.getX() - size || x + 1 > center.getX() + size || z < center.getZ() - size ||
+                    z + 1 > center.getZ() + size) {
                 return true;
             }
         }
@@ -73,7 +74,7 @@ public class PortalCreateListener implements Listener {
             var getClaimMethod = homesteadPlugin.getClass().getMethod("getClaimAt", Chunk.class);
 
             for (var block : event.getBlocks()) {
-                var chunk = block.getChunk();
+                var chunk = block.getWorld().getChunkAt(block.getX() >> 4, block.getZ() >> 4);
                 var claim = getClaimMethod.invoke(null, chunk);
                 if (claim != null) {
                     return true;
@@ -96,8 +97,7 @@ public class PortalCreateListener implements Listener {
 
         // Prefer notifying the player directly.
         if (event.getEntity() instanceof Player player) {
-            player.sendMessage(message);
-            return;
+            player.getScheduler().run(plugin, _ -> player.sendMessage(message), null);
         }
 
         // Find the source location safely.
@@ -107,32 +107,29 @@ public class PortalCreateListener implements Listener {
         }
 
         var sourceLocation = blocks.getFirst().getLocation();
-        if (sourceLocation.getWorld() == null) {
-            return;
-        }
+        var netherX = sourceLocation.getX() / 8.0;
+        var netherZ = sourceLocation.getZ() / 8.0;
+        var radiusSquared = 64.0 * 64.0;
 
-        // Convert the Overworld coordinates to Nether coordinates.
-        Bukkit.getWorlds().stream()
-                .filter(world -> world.getEnvironment() == World.Environment.NETHER)
-                .forEach(nether -> {
-                    double netherX = sourceLocation.getX() / 8.0;
-                    double netherZ = sourceLocation.getZ() / 8.0;
-                    double radiusSquared = 64.0 * 64.0;
-
-                    // Schedule the message on each player's owning region.
-                    for (var nearbyPlayer : nether.getPlayers()) {
-                        var playerLocation = nearbyPlayer.getLocation();
-                        double dx = playerLocation.getX() - netherX;
-                        double dz = playerLocation.getZ() - netherZ;
-
-                        // Only horizontal distance matters for this radius check.
-                        if (dx * dx + dz * dz > radiusSquared) {
-                            continue;
-                        }
-
-                        nearbyPlayer.getScheduler().run(plugin, _ -> nearbyPlayer.sendMessage(message), null);
+        // Schedule player access on each player's owning region.
+        Bukkit.getGlobalRegionScheduler().run(plugin, _ -> {
+            for (var nearbyPlayer : Bukkit.getOnlinePlayers()) {
+                nearbyPlayer.getScheduler().run(plugin, _ -> {
+                    if (!nearbyPlayer.isOnline() ||
+                            nearbyPlayer.getWorld().getEnvironment() != World.Environment.NETHER) {
+                        return;
                     }
-                });
 
+                    var playerLocation = nearbyPlayer.getLocation();
+                    double dx = playerLocation.getX() - netherX;
+                    double dz = playerLocation.getZ() - netherZ;
+
+                    // Only horizontal distance matters for this radius check.
+                    if (dx * dx + dz * dz <= radiusSquared) {
+                        nearbyPlayer.sendMessage(message);
+                    }
+                }, null);
+            }
+        });
     }
 }

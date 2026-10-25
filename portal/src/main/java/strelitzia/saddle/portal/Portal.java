@@ -8,13 +8,11 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.event.player.PlayerMoveEvent;
 import strelitzia.saddle.portal.config.PortalConfigProvider;
 import strelitzia.saddle.portal.effect.PortalEffect;
 
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,6 +21,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //required for jackson deserialization
 public class Portal implements Serializable {
+
+    private static final char SPACE = '_';
 
     private UUID id = UUID.randomUUID();
     private UUID world;
@@ -33,7 +33,6 @@ public class Portal implements Serializable {
     private String icon;
     private boolean isSpawn;
     private String name;
-    private String sound;
 
     public Portal(PortalCorner location1, PortalCorner location2, String name, World world) {
         this.name = name;
@@ -45,6 +44,11 @@ public class Portal implements Serializable {
                 (double) (min.x() + max.x()) / 2,
                 (double) (min.y() + max.y()) / 2,
                 (double) (min.z() + max.z()) / 2, 0, 0);
+    }
+
+    /// @return formatted name (commands don't like spaces)
+    public String getFormattedName() {
+        return name.replace(SPACE, ' ');
     }
 
     public Location getExit() {
@@ -103,9 +107,5 @@ public class Portal implements Serializable {
         return location.getX() >= min.x() && location.getX() <= max.x()
                 && location.getY() >= min.y() && location.getY() <= max.y()
                 && location.getZ() >= min.z() && location.getZ() <= max.z();
-    }
-
-    public @Nullable Sound soundEffect() {
-        return Objects.requireNonNull(PortalEffect.fromType(effectType)).getSound();
     }
 }

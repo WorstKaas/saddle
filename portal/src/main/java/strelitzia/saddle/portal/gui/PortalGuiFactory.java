@@ -69,9 +69,11 @@ public class PortalGuiFactory {
         // Edit Favourites button transitions to the favorites editor
         buttons.add(ActionButton.create(Component.text("Edit Favourites"), null, 200,
                 DialogAction.customClick((_, _) -> {
-                    var favouritesDialog = getFavouritesDialog(source, onPortalSelect, updatedFavourites -> {
-                        portalManager.setFavourites(player, updatedFavourites).thenRunAsync(() -> player.showDialog(getDialog(source, onPortalSelect, player)));
-                    }, player);
+                    var favouritesDialog =
+                            getFavouritesDialog(source, onPortalSelect, updatedFavourites -> portalManager
+                                            .setFavourites(player, updatedFavourites)
+                                            .thenRunAsync(() -> player.showDialog(getDialog(source, onPortalSelect, player))),
+                                    player);
 
                     player.showDialog(favouritesDialog);
                 }, SINGLE_USE)));
@@ -93,13 +95,15 @@ public class PortalGuiFactory {
 
     /// Creates a button for selecting a portal
     private static ActionButton createPortalButton(Portal portal, Consumer<Portal> onPortalSelect, boolean favourite) {
-        var buttonText = Component.text(portal.getName(), favourite ? NamedTextColor.GOLD : NamedTextColor.WHITE);
+        var buttonText =
+                Component.text(portal.getFormattedName(), favourite ? NamedTextColor.GOLD : NamedTextColor.WHITE);
         var buttonAction = DialogAction.customClick((_, _) -> onPortalSelect.accept(portal), SINGLE_USE);
         return ActionButton.create(buttonText, null, 200, buttonAction);
     }
 
 
-    public static Dialog getFavouritesDialog(Portal source, Consumer<Portal> onPortalSelect, Consumer<Map<UUID, Boolean>> onSave, Player player) {
+    public static Dialog getFavouritesDialog(Portal source, Consumer<Portal> onPortalSelect,
+                                             Consumer<Map<UUID, Boolean>> onSave, Player player) {
         if (portalManager == null) {
             throw new IllegalStateException("PortalManager not initialized");
         }
@@ -113,7 +117,7 @@ public class PortalGuiFactory {
         var inputs = new ArrayList<DialogInput>();
         for (var portal : portals) {
             boolean isFavourite = favourites.contains(portal.getId());
-            inputs.add(DialogInput.bool(inputKey(portal), Component.text(portal.getName()))
+            inputs.add(DialogInput.bool(inputKey(portal), Component.text(portal.getFormattedName()))
                     .initial(isFavourite)
                     .build());
         }

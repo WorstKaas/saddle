@@ -103,42 +103,42 @@ public class PlayerListener implements Listener {
     private Consumer<Portal> warp(Player player) {
         return portal -> {
             // Schedule entity operations on their own region threads to avoid thread violations
-            var leashedEntities = player.getWorld().getEntities().stream()
-                    .filter(e -> e instanceof LivingEntity)
+            var leashedEntities = player.getWorld().getNearbyEntities(
+                            player.getBoundingBox().expand(40),
+                            entity -> entity instanceof LivingEntity livingEntity
+                                    && livingEntity.isLeashed()
+                                    && livingEntity.getLeashHolder() == player
+                    ).stream()
                     .map(LivingEntity.class::cast)
-                    .filter(le -> {
-                        try {
-                            return le.isLeashed() && le.getLeashHolder() == player;
-                        } catch (Exception e) {
-                            // Entity may be on a different thread, skip it
-                            return false;
-                        }
-                    })
                     .toList();
 
             for (var entity : leashedEntities) {
                 entity.getScheduler().run(plugin, _ -> entity.setLeashHolder(null), null);
             }
-
+            playSound(player, portal);
             Objects.requireNonNullElse(player.getVehicle(), player).teleportAsync(portal.getExit()).thenRunAsync(() -> {
                 // warp entities
                 leashedEntities.forEach(
-                        it -> it.teleportAsync(portal.getExit()).thenRunAsync(() -> {
-                            it.getScheduler().run(plugin, _ -> it.setLeashHolder(player), null);
-                        }));
-
-                // play portal exit effect
-                var loc = player.getLocation();
-                for (var p : player.getLocation().getWorld().getPlayers()) {
-                    if (p.getLocation().distanceSquared(loc) <= 20 * 20) {
-                        var sound = portal.effect().getSound();
-                        if (sound != null) {
-                            p.playSound(loc, sound, 1.0f, 1.0f);
-                        }
-                    }
-                }
+                        it -> it
+                                .teleportAsync(portal.getExit())
+                                .thenRunAsync(
+                                        () -> it.getScheduler().run(plugin, _ -> it.setLeashHolder(player), null)));
+                playSound(player, portal);
             });
         };
+    }
+
+    private static void playSound(Player player, Portal portal) {
+        // play portal exit effect
+        var loc = player.getLocation();
+        for (var p : player.getLocation().getWorld().getPlayers()) {
+            if (p.getLocation().distanceSquared(loc) <= 20 * 20) {
+                var sound = portal.effect().getSound();
+                if (sound != null) {
+                    p.playSound(loc, sound, 1.0f, 1.0f);
+                }
+            }
+        }
     }
 
 }

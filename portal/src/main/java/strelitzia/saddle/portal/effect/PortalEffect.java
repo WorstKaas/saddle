@@ -31,9 +31,13 @@ public abstract class PortalEffect {
                 Map.entry("lava", new ParticlePortal(Particle.LAVA, 0.15, Sound.ITEM_FIRECHARGE_USE)),
                 Map.entry("water", new ParticlePortal(Particle.FALLING_WATER, 1, Sound.ITEM_BUCKET_EMPTY)),
                 Map.entry("snow", new ParticlePortal(Particle.SNOWFLAKE, 1, Sound.ENTITY_SNOW_GOLEM_DEATH)),
-                Map.entry("sand", new ParticlePortal(Particle.FALLING_DUST, 1, Sound.ENTITY_CAMEL_HUSK_DASH)),
+                Map.entry("sand", new ParticlePortal(Particle.CLOUD, 1, Sound.ENTITY_CAMEL_HUSK_DASH)),
                 Map.entry("smoke",
                         new ParticlePortal(Particle.CAMPFIRE_SIGNAL_SMOKE, 0.25, Sound.BLOCK_FIRE_EXTINGUISH)),
+                Map.entry("firefly", new ParticlePortal(Particle.FIREFLY, 2, Sound.BLOCK_FIREFLY_BUSH_IDLE)),
+                Map.entry("spore", new ParticlePortal(Particle.SPORE_BLOSSOM_AIR, 1, Sound.BLOCK_SPORE_BLOSSOM_STEP)),
+                Map.entry("squid", new ParticlePortal(Particle.SQUID_INK, 0.3, Sound.ENTITY_GLOW_SQUID_SQUIRT)),
+                Map.entry("sculk", new ParticlePortal(Particle.SCULK_CHARGE, 0.3, Sound.ENTITY_ALLAY_ITEM_THROWN)),
                 Map.entry("none", new NoEffect()));
     }
 
@@ -47,7 +51,7 @@ public abstract class PortalEffect {
     ///
     /// @return the effect type string
     public final String getType() {
-        return TYPES.values().stream().filter(e -> e == this).findFirst().get().getType();
+        return TYPES.entrySet().stream().filter(e -> e.getValue() == this).findFirst().get().getKey();
     }
 
     /// Creates a PortalEffect instance from a type string

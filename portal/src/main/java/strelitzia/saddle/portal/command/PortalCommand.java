@@ -108,7 +108,8 @@ public class PortalCommand extends BaseCommand {
         return (player, _) -> {
             player.sendMessage("§6=== Portal Commands ===");
             player.sendMessage("§e/portal list §7- Lists all portals");
-            player.sendMessage("§e/portal create <name> <x1> <y1> <z1> <x2> <y2> <z2> §7- Creates a portal");
+            player.sendMessage(
+                    "§e/portal create <name> <x1> <y1> <z1> <x2> <y2> <z2> §7- Creates a portal. Use `_` instead of spaces in the name");
             player.sendMessage("§e/portal delete <name> §7- Deletes a portal");
             player.sendMessage(
                     "§e/portal edit <name> location <x1> <y1> <z1> <x2> <y2> <z2> §7- Updates portal boundaries");
